@@ -6,8 +6,6 @@ import cookie from "cookie-parser";
 import express from "express";
 // import { v4 as uuidv4 } from "uuid";
 
-import userRoute from "./routes/user.route.js";
-
 dotenv.config();
 
 const app = express();
@@ -18,8 +16,6 @@ app.use(cors());
 app.use(express.json());
 app.use(cookie());
 app.use(compression());
-
-app.use("/api", userRoute);
 
 const severStarter = () => {
 	try {
