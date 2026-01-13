@@ -19,7 +19,7 @@ app.use(compression());
 
 const severStarter = () => {
 	try {
-		app.listen(PORT, () => {
+		app.listen(PORT, "localhost", () => {
 			console.log(`Server was listening on PORT ${PORT}`);
 		});
 	} catch (error) {
