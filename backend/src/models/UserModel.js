@@ -1,16 +1,22 @@
 import mongoose from "mongoose";
 
-/**
- * @param {Object} mongoose
- * @param {Object} mongoose.Schema
- *
- */
-
 const userSchema = new mongoose.Schema(
 	{
-		role: {
+		name: {
 			type: String,
-			required: [true, "name is required."],
+			required: true,
+		},
+		email: {
+			type: String,
+			required: true,
+		},
+		password: {
+			type: String,
+			required: true,
+		},
+		country: {
+			type: String,
+			required: true,
 		},
 	},
 	{

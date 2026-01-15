@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cookie());
 app.use(compression());
 
-app.use("/api", userRoute);
+app.use("/api/user", userRoute);
 app.use("/api/weather", weatherRoute);
 
 app.use(globalErrorHandler);

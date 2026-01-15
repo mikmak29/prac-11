@@ -1,9 +1,17 @@
 import User from "../models/UserModel.js";
 
-export const getAllData = async () => {
-	return await User.find().sort({ createdAt: -1 });
+export const registerData = async (userData) => {
+	return await User.create(userData);
 };
 
-export const createData = async (userData) => {
-	return await User.create(userData);
+export const loginData = async (userEmail) => {
+	return await User.findOne({ email: userEmail });
+};
+
+export const validateEmail = async (userEmail) => {
+	return await User.findOne({ email: userEmail });
+};
+
+export const currentPage = async () => {
+	return await User.find();
 };
