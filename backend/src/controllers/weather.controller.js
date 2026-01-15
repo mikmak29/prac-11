@@ -49,9 +49,9 @@ export const fetchAllWeathers = asyncErrorHandler(async (req, res) => {
 export const updateWeatherDataById = asyncErrorHandler(async (req, res) => {
 	const { id } = req.params;
 
-	const isIdExist = await weatherService.validateId({ id });
+	const isIdExist = await weatherService.validateId(id);
 
-	if (isIdExist) {
+	if (!isIdExist) {
 		return conditionalErrorHandler("Invalid ID or record not found", 409);
 	}
 
@@ -68,9 +68,9 @@ export const updateWeatherDataById = asyncErrorHandler(async (req, res) => {
 export const deleteWeatherDataById = asyncErrorHandler(async (req, res) => {
 	const { id } = req.params;
 
-	const isIdExist = await weatherService.validateId({ id });
+	const isIdExist = await weatherService.validateId(id);
 
-	if (isIdExist) {
+	if (!isIdExist) {
 		return conditionalErrorHandler("Invalid ID or record not found", 409);
 	}
 
