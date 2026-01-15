@@ -48,20 +48,22 @@ export const fetchAllWeathers = asyncErrorHandler(async (req, res) => {
 
 export const updateWeatherDataById = asyncErrorHandler(async (req, res) => {
 	const { id } = req.params;
+	const { name } = req.body;
 
+	// If name changes, doesn't update the current dataset. Must Fix
 	const isIdExist = await weatherService.validateId(id);
 
 	if (!isIdExist) {
 		return conditionalErrorHandler("Invalid ID or record not found", 409);
 	}
 
-	const updatedData = await weatherService.updateData(id, req.body, { new: true });
+	const weatherData = await weatherAPI(name);
+	await weatherService.updateData(id, weatherData, { new: true });
 
-	console.log(updatedData);
 	res.status(200).json({
 		status: "OK",
 		message: "Updated successfully",
-		updatedData: updatedData,
+		updatedData: weatherData,
 	});
 });
 
