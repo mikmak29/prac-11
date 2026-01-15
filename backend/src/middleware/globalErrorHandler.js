@@ -8,6 +8,7 @@ const globalErrorHandler = (error, req, res, next) => {
 	const errorFound = {
 		...matchedError,
 		errorMessage: error.message,
+		errorStack: error.stack,
 	};
 	res.status(status).json(errorFound);
 };
