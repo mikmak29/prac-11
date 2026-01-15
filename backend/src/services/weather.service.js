@@ -21,5 +21,5 @@ export const validateEmail = async (id) => {
 };
 
 export const validateId = async (id) => {
-	return await Weather.findOne({ _id: id });
+	return await Weather.findById(id);
 };
