@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
 
+/**
+ * @param {Object} mongoose
+ * @param {Object} mongoose.Schema
+ *
+ */
+
 const userSchema = new mongoose.Schema(
 	{
-		userId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
-		},
 		role: {
 			type: String,
 			required: [true, "name is required."],
