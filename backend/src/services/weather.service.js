@@ -17,9 +17,9 @@ export const deleteData = async (id) => {
 };
 
 export const validateEmail = async (id) => {
-	return await Weather.findOne(id);
+	return await Weather.findById(id);
 };
 
 export const validateId = async (id) => {
-	return await Weather.findOne(id);
+	return await Weather.findOne({ _id: id });
 };
