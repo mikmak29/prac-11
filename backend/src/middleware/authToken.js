@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import asyncErrorHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
-import conditionalErrorHandler from "../utils/conditionalErrorHandler.js";
+import throwHTTPError from "../utils/throwHTTPError.js";
 
 dotenv.config();
 
@@ -10,19 +10,19 @@ const authToken = asyncErrorHandler(async (req, res, next) => {
 	const token = headers && headers.split(" ")[1];
 
 	if (!token) {
-		return conditionalErrorHandler("Unauthorized", 401);
+		return throwHTTPError("Unauthorized", 401);
 	}
 
 	jwt.verify(token, process.env.ACCESS_TOKEN, (error, data) => {
 		if (error) {
-			return conditionalErrorHandler("Invalid token.", 401);
+			return throwHTTPError("Invalid token.", 401);
 		}
 
 		const user = data.user || data; // Extract the userPayload
 
 		// if data not found, return an error
 		if (!user) {
-			return conditionalErrorHandler("Invalid token structure", 401);
+			return throwHTTPError("Invalid token structure", 401);
 		}
 
 		// Extracted userPayload for req.user to access the data from the GET method
