@@ -17,8 +17,6 @@ export const createWeatherData = asyncErrorHandler(async (req, res) => {
 
 	const saveData = isDataSave || false;
 
-	console.log(saveData);
-
 	const weatherData = await weatherAPI(name);
 	if (saveData === false) {
 		return res.status(200).json({
