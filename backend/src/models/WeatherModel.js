@@ -6,6 +6,10 @@ const weatherSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
 		},
+		ownedBy: {
+			type: String,
+			required: true,
+		},
 		name: {
 			type: String,
 			required: true,

@@ -18,14 +18,16 @@ const authToken = asyncErrorHandler(async (req, res, next) => {
 			return conditionalErrorHandler("Invalid token.", 401);
 		}
 
-		const user = data.user || data;
+		const user = data.user || data; // Extract the userPayload
 
+		// if data not found, return an error
 		if (!user) {
 			return conditionalErrorHandler("Invalid token structure", 401);
 		}
 
-		console.log("auth: ", user);
+		// Extracted userPayload for req.user to access the data from the GET method
 		req.user = {
+			id: user.id || user._id,
 			name: user.name,
 			email: user.email,
 			country: user.country,
