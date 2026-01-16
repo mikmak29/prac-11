@@ -4,26 +4,26 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 import * as userService from "../services/user.service.js";
-import conditionalErrorHandler from "../utils/conditionalErrorHandler.js";
+import throwHTTPError from "../utils/throwHTTPError.js";
 import { generateAccessToken, generateRefreshAccessToken } from "../utils/accessToken.js";
 
 dotenv.config();
 
 export const registerUserData = asyncErrorHandler(async (req, res) => {
 	if (!req.body) {
-		return conditionalErrorHandler("Request body is required", 400);
+		return throwHTTPError("Request body is required", 400);
 	}
 
 	const { name, email, password, country } = req.body;
 
 	if (!name || !email || !password || !country) {
-		return conditionalErrorHandler("All fields are required.", 409);
+		return throwHTTPError("All fields are required.", 409);
 	}
 
 	const isEmailExist = await userService.validateEmail(email);
 
 	if (isEmailExist) {
-		return conditionalErrorHandler("This Email already registered.", 409);
+		return throwHTTPError("This Email already registered.", 409);
 	}
 
 	const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,13 +44,13 @@ export const registerUserData = asyncErrorHandler(async (req, res) => {
 
 export const loginUser = asyncErrorHandler(async (req, res) => {
 	if (!req.body) {
-		return conditionalErrorHandler("Request body is required", 400);
+		return throwHTTPError("Request body is required", 400);
 	}
 
 	const { email, password } = req.body;
 
 	if (!email || !password) {
-		return conditionalErrorHandler("All fields are required.", 401);
+		return throwHTTPError("All fields are required.", 401);
 	}
 
 	const user = await userService.validateEmail(email);
@@ -58,7 +58,7 @@ export const loginUser = asyncErrorHandler(async (req, res) => {
 	const isPasswordMatch = await bcrypt.compare(password, user.password);
 
 	if (!isPasswordMatch) {
-		return conditionalErrorHandler("Invalid email or password.", 409);
+		return throwHTTPError("Invalid email or password.", 409);
 	}
 
 	const userPayload = {
@@ -89,7 +89,7 @@ export const refreshToken = asyncErrorHandler(async (req, res) => {
 	const token = req.cookies?.token;
 
 	if (!token) {
-		return conditionalErrorHandler("Unauthorized", 401);
+		return throwHTTPError("Unauthorized", 401);
 	}
 
 	try {
@@ -115,7 +115,7 @@ export const refreshToken = asyncErrorHandler(async (req, res) => {
 
 		res.status(200).json({ accessToken });
 	} catch (error) {
-		return conditionalErrorHandler(error.message, 409);
+		return throwHTTPError(error.message, 409);
 	}
 });
 

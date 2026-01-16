@@ -1,15 +1,25 @@
+import dotenv from "dotenv";
 import STATUS_CODE from "../constants/STATUS_CODE.js";
 
-const globalErrorHandler = (error, req, res, next) => {
-	const status = error.status || error.statusCode || 500;
+dotenv.config();
 
-	const matchedError = STATUS_CODE[status] || STATUS_CODE[500];
+const globalErrorHandler = (error, req, res, next) => {
+	const status = error.statusCode || 500;
+
+	console.log(error.statusCode);
+
+	const matchedError = STATUS_CODE[status];
 
 	const errorFound = {
-		...matchedError,
+		status: status,
+		errorTitle: matchedError.title,
 		errorMessage: error.message,
-		errorStack: error.stack,
 	};
+
+	if (process.env.NODE_ENV === "development") {
+		errorFound.stack = error.stack;
+	}
+
 	res.status(status).json(errorFound);
 };
 
