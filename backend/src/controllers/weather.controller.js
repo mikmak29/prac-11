@@ -26,7 +26,14 @@ export const createWeatherData = asyncErrorHandler(async (req, res) => {
 		});
 	}
 
-	const createdWeatherData = await weatherService.createData(weatherData);
+	// Add userId to weather data to associate it with the logged-in user
+	const weatherDataWithUserId = {
+		userId: req.user.id,
+		ownedBy: req.user.name,
+		...weatherData,
+	};
+
+	const createdWeatherData = await weatherService.createData(weatherDataWithUserId);
 
 	res.status(200).json({
 		status: "OK",
@@ -36,42 +43,67 @@ export const createWeatherData = asyncErrorHandler(async (req, res) => {
 });
 
 export const fetchAllWeathers = asyncErrorHandler(async (req, res) => {
-	const data = await weatherService.weatherData();
+	// Only fetch weather data for the logged-in user
+	const data = await weatherService.weatherData(req.user.id);
 
-	if (!data) {
+	if (!data || data.length === 0) {
 		return conditionalErrorHandler("No data.", 409);
 	}
 	res.status(200).json(data);
 });
 
+export const weatherDataChecker = asyncErrorHandler(async (req, res) => {
+	const data = await weatherService.weatherDataChecker();
+
+	res.status(200).json(data);
+});
+
 export const updateWeatherDataById = asyncErrorHandler(async (req, res) => {
+	if (!req.body) {
+		return conditionalErrorHandler("Request body is required", 400);
+	}
+
 	const { id } = req.params;
 	const { name } = req.body;
 
-	// If name changes, doesn't update the current dataset. Must Fix
-	const isIdExist = await weatherService.validateId(id);
+	// Check if the weather data exists and belongs to the logged-in user
+	const weatherRecord = await weatherService.validateOwnership(id, req.user.id);
 
-	if (!isIdExist) {
-		return conditionalErrorHandler("Invalid ID or record not found", 409);
+	if (!weatherRecord) {
+		return conditionalErrorHandler("Invalid ID, record not found, or you don't have permission to update this record", 409);
 	}
 
-	const weatherData = await weatherAPI(name);
-	await weatherService.updateData(id, weatherData, { new: true });
+	const isCountryNameChange = name || weatherRecord.country;
+
+	const weatherData = await weatherAPI(isCountryNameChange);
+	// Ensure userId is preserved when updating
+	const updatedWeatherData = {
+		userId: req.user.id,
+		ownedBy: req.user.name,
+		...weatherData,
+	};
+
+	await weatherService.updateData(id, updatedWeatherData, { new: true });
 
 	res.status(200).json({
 		status: "OK",
 		message: "Updated successfully",
-		updatedData: weatherData,
+		updatedData: updatedWeatherData,
 	});
 });
 
 export const deleteWeatherDataById = asyncErrorHandler(async (req, res) => {
+	if (!req.body) {
+		return conditionalErrorHandler("Request body is required", 400);
+	}
+
 	const { id } = req.params;
 
-	const isIdExist = await weatherService.validateId(id);
+	// Check if the weather data exists and belongs to the logged-in user
+	const weatherRecord = await weatherService.validateOwnership(id, req.user.id);
 
-	if (!isIdExist) {
-		return conditionalErrorHandler("Invalid ID or record not found", 409);
+	if (!weatherRecord) {
+		return conditionalErrorHandler("Invalid ID, record not found, or you don't have permission to delete this record", 409);
 	}
 
 	const deletedData = await weatherService.deleteData(id);

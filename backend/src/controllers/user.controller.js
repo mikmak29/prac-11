@@ -62,6 +62,7 @@ export const loginUser = asyncErrorHandler(async (req, res) => {
 	}
 
 	const userPayload = {
+		id: user._id,
 		name: user.name,
 		email: user.email,
 		country: user.country,
@@ -95,6 +96,7 @@ export const refreshToken = asyncErrorHandler(async (req, res) => {
 		const decoded = jwt.verify(token, process.env.REFRESH_ACCESS_TOKEN);
 
 		const userPayload = {
+			id: decoded.id,
 			name: decoded.name,
 			email: decoded.email,
 			country: decoded.country,
