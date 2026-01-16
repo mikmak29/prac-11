@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 
 import * as userService from "../services/user.service.js";
 import conditionalErrorHandler from "../utils/conditionalErrorHandler.js";
-// import { accessToken } from "../utils/accessToken.js";
+import { generateAccessToken, generateRefreshAccessToken } from "../utils/accessToken.js";
 
 dotenv.config();
 
@@ -67,16 +67,54 @@ export const loginUser = asyncErrorHandler(async (req, res) => {
 		country: user.country,
 	};
 
-	const accessToken = jwt.sign({ user: userPayload }, process.env.ACCESS_TOKEN);
+	const accessToken = await generateAccessToken(userPayload);
 
-	res.cookie("token", accessToken, {
+	const refreshToken = await generateRefreshAccessToken(userPayload);
+
+	res.cookie("token", refreshToken, {
 		httpOnly: true,
 		secure: true,
 		sameSite: "strict",
 		path: "/api/user",
 	});
 
-	res.status(200).json({ accessToken: accessToken });
+	res.status(200).json({
+		accessToken: accessToken,
+		refreshToken: refreshToken,
+	});
+});
+
+export const refreshToken = asyncErrorHandler(async (req, res) => {
+	const token = req.cookies?.token;
+
+	if (!token) {
+		return conditionalErrorHandler("Unauthorized", 401);
+	}
+
+	try {
+		const decoded = jwt.verify(token, process.env.REFRESH_ACCESS_TOKEN);
+
+		const userPayload = {
+			name: decoded.name,
+			email: decoded.email,
+			country: decoded.country,
+		};
+
+		const accessToken = await generateAccessToken(userPayload);
+
+		const refreshToken = await generateRefreshAccessToken(userPayload);
+
+		res.cookie("token", refreshToken, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "strict",
+			path: "/api/user",
+		});
+
+		res.status(200).json({ accessToken });
+	} catch (error) {
+		return conditionalErrorHandler(error.message, 409);
+	}
 });
 
 export const userCurrentPage = asyncErrorHandler(async (req, res) => {
